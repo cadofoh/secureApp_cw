@@ -25,7 +25,7 @@ class SecureAppController
             $jsonInput = $_POST['jsonInput'] ?? '';
             $emailInput = $_POST['emailInput'] ?? '';
             $passwordInput = $_POST['passwordInput'] ?? '';
-            $addressInput = $_POST['addressInput'] ?? '';
+            $postcodeInput = $_POST['postcodeInput'] ?? '';
             $creditCardInput = $_POST['creditCardInput'] ?? '';
             $ipInput = $_POST['ipInput'] ?? '';
             $additionalInput = $_POST['additionalInput'] ?? '';
@@ -38,7 +38,7 @@ class SecureAppController
                 $jsonInput,
                 $emailInput,
                 $passwordInput,
-                $addressInput,
+                $postcodeInput,
                 $creditCardInput,
                 $ipInput,
                 $additionalInput

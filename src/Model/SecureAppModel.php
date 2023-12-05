@@ -16,7 +16,7 @@ class SecureAppModel
            $jsonInput,
            $emailInput,
            $passwordInput,
-           $addressInput,
+           $postcodeInput,
            $creditCardInput,
            $ipInput,
            $additionalInput
@@ -27,7 +27,7 @@ class SecureAppModel
                !$this->isValidDate($dateInput1) || !$this->isValidDate($dateInput2) ||
                !$this->isValidPhoneNumber($phoneInput) || !$this->isValidJson($jsonInput) ||
                !$this->isValidEmail($emailInput) || !$this->isValidPassword($passwordInput) ||
-               !$this->isValidAddress($addressInput) || !$this->isValidCreditCard($creditCardInput) ||
+               !$this->isValidAddress($postcodeInput) || !$this->isValidCreditCard($creditCardInput) ||
                !$this->isValidIpAddress($ipInput)
            ) {
                // One or more inputs are invalid
@@ -39,13 +39,13 @@ class SecureAppModel
                $stmt = $this->db->prepare(
                    'INSERT INTO client_data 
                    (dateInput1, dateInput2, phoneInput, jsonInput, emailInput, passwordInput, 
-                   addressInput, creditCardInput, ipInput, additionalInput) 
+                   postcodeInput, creditCardInput, ipInput, additionalInput) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                );
    
                $stmt->execute([
                    $dateInput1, $dateInput2, $phoneInput, $jsonInput, $emailInput, $passwordInput,
-                   $addressInput, $creditCardInput, $ipInput, $additionalInput
+                   $postcodeInput, $creditCardInput, $ipInput, $additionalInput
                ]);
    
                return true;
@@ -95,7 +95,7 @@ class SecureAppModel
            return true;
        }
    
-       private function isValidAddress($address)
+       private function isValidPostcode($postcode)
        {
            // Implement address validation logic, return true if valid, false otherwise
            // Example: Check for address format or use external APIs for validation

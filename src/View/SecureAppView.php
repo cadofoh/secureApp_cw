@@ -45,9 +45,9 @@ class SecureAppView
         echo '<input type="password" name="passwordInput" placeholder="SecurePassword123!" required>';
         echo '<br>';
 
-        // Input 7: Address Input
-        echo '<label for="addressInput">Address Input:</label>';
-        echo '<input type="text" name="addressInput" placeholder="123 Main St, Cityville, Country" required>';
+        // Input 7: Postcode Input
+        echo '<label for="postcodeInput">Postcode Input:</label>';
+        echo '<input type="text" name="postcodeInput" placeholder="B11 4NX" required>';
         echo '<br>';
 
         // Input 8: Credit Card Input
