@@ -9,8 +9,6 @@ class SecureAppModel
     {
         $this->db = $db;
     }
-
-    php
     public function storeData(
            $dateInput1,
            $dateInput2,
@@ -59,9 +57,14 @@ class SecureAppModel
    
        private function isValidDate($date)
        {
-           // Implement date validation logic, return true if valid, false otherwise
-           // Example: You can use DateTime::createFromFormat() to validate the date format
-           return true;
+        // Validate against 'yyyy-mm-dd' format
+        $dateTime1 = DateTime::createFromFormat('Y-m-d', $date);
+
+        // Validate against 'dd/mm/yyyy' format
+        $dateTime2 = DateTime::createFromFormat('d/m/Y', $date);
+
+        return ($dateTime1 && $dateTime1->format('Y-m-d') === $date) ||
+            ($dateTime2 && $dateTime2->format('d/m/Y') === $date);
        }
    
        private function isValidPhoneNumber($phoneNumber)
