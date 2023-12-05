@@ -103,9 +103,11 @@ class SecureAppModel
 
     private function isValidEmail($email)
     {
-        // Implement email validation logic, return true if valid, false otherwise
-        // Example: Use filter_var() with FILTER_VALIDATE_EMAIL
-        return true;
+        // Regular expression for basic email validation
+        $pattern = '/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/';
+
+        // Use preg_match to test the email against the pattern
+        return preg_match($pattern, $email) === 1;
     }
 
     private function isValidPassword($password)
