@@ -119,9 +119,11 @@ class SecureAppModel
 
     private function isValidPostcode($postcode)
     {
-        // Implement address validation logic, return true if valid, false otherwise
-        // Example: Check for address format or use external APIs for validation
-        return true;
+        // Regular expression for basic UK postcode validation
+        $pattern = '/^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i';
+
+        // Use preg_match to test the postcode against the pattern
+        return preg_match($pattern, $postcode) === 1;
     }
 
     private function isValidCreditCard($creditCard)
