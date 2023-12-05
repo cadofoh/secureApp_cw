@@ -135,8 +135,7 @@ class SecureAppModel
 
     private function isValidIpAddress($ipAddress)
     {
-        // Implement IP address validation logic, return true if valid, false otherwise
-        // Example: Use filter_var() with FILTER_VALIDATE_IP
-        return true;
+        // Use filter_var to validate the IP address
+        return filter_var($ipAddress, FILTER_VALIDATE_IP) !== false;
     }
 }
