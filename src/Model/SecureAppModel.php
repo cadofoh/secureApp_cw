@@ -73,14 +73,14 @@ class SecureAppModel
         return true;
     }
 
-    private function isValidJson($json)
+    private function isValidJson($jsonInput)
     {
         // URL of the JSONLint API
         $jsonLintApiUrl = 'https://jsonlint.com/api';
 
         // Set up the POST request
         $postData = [
-            'json' => $json,
+            'json' => $jsonInput,
         ];
 
         $options = [
@@ -101,41 +101,69 @@ class SecureAppModel
         return isset($result->error) ? false : true;
     }
 
-    private function isValidEmail($email)
+    private function isValidEmail($emailInput)
     {
         // Regular expression for basic email validation
         $pattern = '/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/';
 
         // Use preg_match to test the email against the pattern
-        return preg_match($pattern, $email) === 1;
+        return preg_match($pattern, $emailInput) === 1;
     }
 
-    private function isValidPassword($password)
+    private function isValidPassword($passwordInput)
     {
         // Implement password validation logic, return true if valid, false otherwise
         // Example: Check for password strength requirements
         return true;
     }
 
-    private function isValidPostcode($postcode)
+    private function isValidPostcode($postcodeInput)
     {
         // Regular expression for basic UK postcode validation
         $pattern = '/^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i';
 
         // Use preg_match to test the postcode against the pattern
-        return preg_match($pattern, $postcode) === 1;
+        return preg_match($pattern, $postcodeInput) === 1;
     }
 
-    private function isValidCreditCard($creditCard)
+    public function isValidCreditCard($creditCardInput)
     {
-        // Implement credit card validation logic, return true if valid, false otherwise
-        // Example: Use algorithms like Luhn's algorithm to check credit card numbers
-        return true;
+        // Remove spaces and non-numeric characters
+        $cleanCreditCardNumber = preg_replace('/\D/', '', $creditCardInput);
+
+        // Check if the credit card number is numeric and passes the Luhn algorithm
+        if (is_numeric($cleanCreditCardNumber) && $this->luhnCheck($cleanCreditCardNumber)) {
+            return true;
+        }
+
+        return false;
     }
 
-    private function isValidIpAddress($ipAddress)
+    // Luhn algorithm check
+    private function luhnCheck($number)
+    {
+        $number = (string)$number;
+        $sum = 0;
+
+        for ($i = 0; $i < strlen($number); $i++) {
+            $digit = (int)$number[$i];
+
+            if ($i % 2 === 0) {
+                $digit *= 2;
+                if ($digit > 9) {
+                    $digit -= 9;
+                }
+            }
+
+            $sum += $digit;
+        }
+
+        return ($sum % 10 === 0);
+    }
+
+    private function isValidIpAddress($ipInput)
     {
         // Use filter_var to validate the IP address
-        return filter_var($ipAddress, FILTER_VALIDATE_IP) !== false;
+        return filter_var($ipInput, FILTER_VALIDATE_IP) !== false;
     }
 }
