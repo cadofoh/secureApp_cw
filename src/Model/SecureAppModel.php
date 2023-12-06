@@ -21,16 +21,46 @@ class SecureAppModel
         $ipInput,
         $additionalInput
     ) {
+        $errors = [];
+
         // Validate inputs
-        if (
-            !$this->isValidDate($dateInput1) || !$this->isValidDate($dateInput2) ||
-            !$this->isValidPhoneNumber($phoneInput) || !$this->isValidJson($jsonInput) ||
-            !$this->isValidEmail($emailInput) || !$this->isValidPassword($passwordInput) ||
-            !$this->isValidPostcode($postcodeInput) || !$this->isValidCreditCard($creditCardInput) ||
-            !$this->isValidIpAddress($ipInput)
-        ) {
-            // One or more inputs are invalid
-            return false;
+        if (!$this->isValidDate($dateInput1) || !$this->isValidDate($dateInput2)) {
+            $errors['dateInput'] = 'Invalid date format';
+        }
+
+        if (!$this->isValidPhoneNumber($phoneInput)) {
+            $errors['phoneInput'] = 'Invalid phone number format Please use the format +44 20 7946 0958.';
+        }
+
+        if (!$this->isValidJson($jsonInput)) {
+            $errors['jsonInput'] = 'Invalid JSON format Please provide valid JSON data.';
+        }
+
+        if (!$this->isValidEmail($emailInput)) {
+            $errors['emailInput'] = 'Invalid email format. Please provide a valid email';
+        }
+
+        if (!$this->isValidPassword($passwordInput)) {
+            $errors['passwordInput'] = 'Invalid password format. Please follow the password requirements.';
+        }
+
+        if (!$this->isValidPostcode($postcodeInput)) {
+            $errors['postcodeInput'] = 'Invalid UK postcode format. Please use a valid format (e.g., B11 4NX)';
+        }
+
+        if (!$this->isValidCreditCard($creditCardInput)) {
+            $errors['creditCardInput'] = 'Invalid credit card format. Please provide a valid credit card number';
+        }
+
+        if (!$this->isValidIpAddress($ipInput)) {
+            $errors['ipInput'] = 'Invalid IP address format. Please provide a valid IP address. eg. 192.168.0.1';
+        }
+
+        // Add validations for other fields
+
+        // If there are errors, return them
+        if (!empty($errors)) {
+            return $errors;
         }
 
         // Input validation passed, store data in the database
