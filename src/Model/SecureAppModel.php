@@ -107,9 +107,18 @@ class SecureAppModel
         return preg_match($pattern, $phoneNumber) === 1;
     }
 
+    //valiation with API will be done in front end
     private function isValidJson($jsonInput)
     {
-      return true;
+        // Try to decode the JSON string
+        $decoded = json_decode($jsonInput);
+
+        // Check for JSON parsing errors
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            return false; // Invalid JSON
+        }
+
+        return true; // Valid JSON
     }
 
 
