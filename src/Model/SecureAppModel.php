@@ -29,7 +29,7 @@ class SecureAppModel
         }
 
         if (!$this->isValidPhoneNumber($phoneInput)) {
-            $errors['phoneInput'] = 'Invalid phone number format Please use the format +44 20 7946 0958.';
+            $errors['phoneInput'] = 'Invalid phone number format Please use the format +44 1234 56789.';
         }
 
         if (!$this->isValidJson($jsonInput)) {
@@ -40,8 +40,10 @@ class SecureAppModel
             $errors['emailInput'] = 'Invalid email format. Please provide a valid email';
         }
 
-        if (!$this->isValidPassword($passwordInput)) {
-            $errors['passwordInput'] = 'Invalid password format. Please follow the password requirements.';
+        $passwordErrors = $this->isValidPassword($passwordInput);
+
+        if (!empty($passwordErrors)) {
+            $errors['passwordInput'] = $passwordErrors;
         }
 
         if (!$this->isValidPostcode($postcodeInput)) {
@@ -53,7 +55,7 @@ class SecureAppModel
         }
 
         if (!$this->isValidIpAddress($ipInput)) {
-            $errors['ipInput'] = 'Invalid IP address format. Please provide a valid IP address. eg. 192.168.0.1';
+            $errors['ipInput'] = 'Please provide a valid IP address. eg. 192.168.0.1';
         }
 
         // Add validations for other fields
@@ -98,38 +100,18 @@ class SecureAppModel
 
     private function isValidPhoneNumber($phoneNumber)
     {
-        // Implement phone number validation logic, return true if valid, false otherwise
-        // Example: Use regular expressions to validate the phone number format
-        return true;
+        // Validate UK phone number format: +44 7911 123456
+        $pattern = '/^\+\d{2}\s\d{4}\s\d{6}$/';
+
+        // Use preg_match to test the phone number against the pattern
+        return preg_match($pattern, $phoneNumber) === 1;
     }
 
     private function isValidJson($jsonInput)
     {
-        // URL of the JSONLint API
-        $jsonLintApiUrl = 'https://jsonlint.com/api';
-
-        // Set up the POST request
-        $postData = [
-            'json' => $jsonInput,
-        ];
-
-        $options = [
-            'http' => [
-                'header'  => 'Content-type: application/x-www-form-urlencoded',
-                'method'  => 'POST',
-                'content' => http_build_query($postData),
-            ],
-        ];
-
-        $context  = stream_context_create($options);
-        $response = file_get_contents($jsonLintApiUrl, false, $context);
-
-        // Decode the JSON response
-        $result = json_decode($response);
-
-        // Check if the JSON is valid
-        return isset($result->error) ? false : true;
+      return true;
     }
+
 
     private function isValidEmail($emailInput)
     {
@@ -142,9 +124,35 @@ class SecureAppModel
 
     private function isValidPassword($passwordInput)
     {
-        // Implement password validation logic, return true if valid, false otherwise
-        // Example: Check for password strength requirements
-        return true;
+        $errors = [];
+
+        // Minimum length requirement
+        if (strlen($passwordInput) < 8) {
+            $errors[] = 'Password must be at least 8 characters long.';
+        }
+
+        // Check for at least one uppercase letter
+        if (!preg_match('/[A-Z]/', $passwordInput)) {
+            $errors[] = 'Password must contain at least one uppercase letter.';
+        }
+
+        // Check for at least one lowercase letter
+        if (!preg_match('/[a-z]/', $passwordInput)) {
+            $errors[] = 'Password must contain at least one lowercase letter.';
+        }
+
+        // Check for at least one digit
+        if (!preg_match('/\d/', $passwordInput)) {
+            $errors[] = 'Password must contain at least one digit.';
+        }
+
+        // Check for at least one special character
+        if (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $passwordInput)) {
+            $errors[] = 'Password must contain at least one special character.';
+        }
+
+        // If there are errors, return them
+        return $errors;
     }
 
     private function isValidPostcode($postcodeInput)
