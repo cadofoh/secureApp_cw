@@ -25,7 +25,7 @@ class SecureAppView
         echo '<label for="dateInput1">Date Input 1:</label>';
         echo '<input type="text" class="form-control" name="dateInput1" placeholder="yyyy-mm-dd" value="' . htmlspecialchars($_POST['dateInput1'] ?? '') . '" required>';
         echo '<small class="form-text text-muted">Format: yyyy-mm-dd</small>';
-        echo '<span class="text-danger">' . ($errors['dateInput'] ?? '') . '</span>';
+        echo '<span class="text-danger">' . ($errors['dateInput1'] ?? '') . '</span>';
         echo '</div>';
 
 
@@ -35,7 +35,7 @@ class SecureAppView
         echo
         '<input type="text" class="form-control" name="dateInput2" placeholder="dd/mm/yyyy"  value="' . htmlspecialchars($_POST['dateInput2'] ?? '') . '" required>';
         echo '<small class="form-text text-muted">Format: dd/mm/yyyy</small>';
-        echo '<span class="text-danger">' . ($errors['dateInput'] ?? '') . '</span>';
+        echo '<span class="text-danger">' . ($errors['dateInput2'] ?? '') . '</span>';
         echo '</div>';
 
         // Input 3: Phone Input
@@ -67,11 +67,12 @@ class SecureAppView
         // Input 6: Password Input
         echo '<div class="form-group">';
         echo '<label for="passwordInput">Password Input:</label>';
-        echo
-        '<input type="password" class="form-control" name="passwordInput"  value="' . htmlspecialchars($_POST['passwordInput'] ?? '') . '" required>';
+        echo '<input type="password" class="form-control" name="passwordInput" value="' . htmlspecialchars($_POST['passwordInput'] ?? '') . '" required>';
         echo '<span class="text-danger">';
-        foreach ($errors['passwordInput'] as $error) {
-            echo $error . '<br>';
+        if (isset($errors['passwordInput']) && is_array($errors['passwordInput'])) {
+            foreach ($errors['passwordInput'] as $error) {
+                echo $error . '<br>';
+            }
         }
         echo '</span>';
         echo '</div>';

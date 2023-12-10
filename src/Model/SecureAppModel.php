@@ -1,13 +1,13 @@
 <?php
 // src/Model/SecureAppModel.php
-
+require_once __DIR__ . '/../config/DatabaseConnection.php';
 class SecureAppModel
 {
     private $db;
 
-    public function __construct(PDO $db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->db = DatabaseConnection::getInstance()->getConnection();
     }
     public function storeData(
         $dateInput1,
@@ -24,8 +24,12 @@ class SecureAppModel
         $errors = [];
 
         // Validate inputs
-        if (!$this->isValidDate($dateInput1) || !$this->isValidDate($dateInput2)) {
-            $errors['dateInput'] = 'Invalid date format';
+        if (!$this->isValidDate($dateInput1)) {
+            $errors['dateInput1'] = 'Invalid date format';
+        }
+
+        if (!$this->isValidDate($dateInput2)) {
+            $errors['dateInput2 '] = 'Invalid date format';
         }
 
         if (!$this->isValidPhoneNumber($phoneInput)) {
