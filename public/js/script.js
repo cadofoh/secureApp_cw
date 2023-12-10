@@ -45,6 +45,7 @@ function isValidPhoneNumber(phoneNumber) {
   return true; // Placeholder, modify as needed
 }
 
+//to be modified to use external API
 function isValidJson(jsonString) {
   try {
     JSON.parse(jsonString);

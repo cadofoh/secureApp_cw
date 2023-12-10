@@ -17,6 +17,7 @@ class SecureAppController
 
     public function handleFormSubmission()
     {
+        $errors = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Retrieve form inputs
             $dateInput1 = $_POST['dateInput1'] ?? '';
@@ -25,32 +26,36 @@ class SecureAppController
             $jsonInput = $_POST['jsonInput'] ?? '';
             $emailInput = $_POST['emailInput'] ?? '';
             $passwordInput = $_POST['passwordInput'] ?? '';
-            $addressInput = $_POST['addressInput'] ?? '';
+            $postcodeInput = $_POST['postcodeInput'] ?? '';
             $creditCardInput = $_POST['creditCardInput'] ?? '';
             $ipInput = $_POST['ipInput'] ?? '';
             $additionalInput = $_POST['additionalInput'] ?? '';
 
             // Validate and store data
-            $success = $this->model->storeData(
+            $result = $this->model->storeData(
                 $dateInput1,
                 $dateInput2,
                 $phoneInput,
                 $jsonInput,
                 $emailInput,
                 $passwordInput,
-                $addressInput,
+                $postcodeInput,
                 $creditCardInput,
                 $ipInput,
                 $additionalInput
             );
-
-            if ($success) {
+            if (is_array($result)) {
+                // Errors occurred, update $errors array
+                $errors = $result;
+            } elseif ($result) {
                 echo 'Data stored successfully!';
+                return; // Don't render the form if data is stored successfully
             } else {
-                echo 'Error storing data. Please check your inputs.';
+                $errors['general'] = 'Error storing data. Please check your inputs.';
             }
         }
-        // Render the HTML form
-        $this->view->renderForm();
+
+        // Render the HTML form with errors
+        $this->view->renderForm($errors);
     }
 }
