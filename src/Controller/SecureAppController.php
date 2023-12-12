@@ -18,6 +18,7 @@ class SecureAppController
     public function handleFormSubmission()
     {
         $errors = [];
+        $successMessage = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Retrieve form inputs
             $dateInput1 = $_POST['dateInput1'] ?? '';
@@ -29,7 +30,7 @@ class SecureAppController
             $postcodeInput = $_POST['postcodeInput'] ?? '';
             $creditCardInput = $_POST['creditCardInput'] ?? '';
             $ipInput = $_POST['ipInput'] ?? '';
-            $additionalInput = $_POST['additionalInput'] ?? '';
+            $xmlInput = $_POST['xmlInput'] ?? '';
 
             // Validate and store data
             $result = $this->model->storeData(
@@ -42,13 +43,13 @@ class SecureAppController
                 $postcodeInput,
                 $creditCardInput,
                 $ipInput,
-                $additionalInput
+                $xmlInput
             );
             if (is_array($result)) {
                 // Errors occurred, update $errors array
                 $errors = $result;
             } elseif ($result) {
-                echo 'Data stored successfully!';
+                header("Location: success.php");
                 return; // Don't render the form if data is stored successfully
             } else {
                 $errors['general'] = 'Error storing data. Please check your inputs.';
