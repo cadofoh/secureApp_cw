@@ -1,6 +1,7 @@
 <?php
 // src/Model/SecureAppModel.php
 require_once __DIR__ . '/../config/DatabaseConnection.php';
+require_once __DIR__ .  '/../Exceptions/ValidationException.php';
 class SecureAppModel
 {
     private $db;
@@ -19,68 +20,77 @@ class SecureAppModel
         $postcodeInput,
         $creditCardInput,
         $ipInput,
-        $additionalInput
+        $xmlInput
     ) {
         $errors = [];
 
         // Validate inputs
+    try {
+
         if (!$this->isValidDate($dateInput1)) {
             $errors['dateInput1'] = 'Invalid date format';
         }
-
+        
         if (!$this->isValidDate($dateInput2)) {
             $errors['dateInput2 '] = 'Invalid date format';
         }
-
+        
         if (!$this->isValidPhoneNumber($phoneInput)) {
-            $errors['phoneInput'] = 'Invalid phone number format Please use the format +44 1234 56789.';
+            $errors['phoneInput'] = 'Invalid phone number format. Please use the format +44 1234 56789.';
         }
 
         if (!$this->isValidJson($jsonInput)) {
-            $errors['jsonInput'] = 'Invalid JSON format Please provide valid JSON data.';
+            $errors['jsonInput'] = 'Invalid JSON format. Please provide valid JSON data.';
         }
 
         if (!$this->isValidEmail($emailInput)) {
             $errors['emailInput'] = 'Invalid email format. Please provide a valid email';
         }
-
+        
         $passwordErrors = $this->isValidPassword($passwordInput);
-
+        
         if (!empty($passwordErrors)) {
             $errors['passwordInput'] = $passwordErrors;
         }
-
+        
         if (!$this->isValidPostcode($postcodeInput)) {
             $errors['postcodeInput'] = 'Invalid UK postcode format. Please use a valid format (e.g., B11 4NX)';
         }
-
+        
         if (!$this->isValidCreditCard($creditCardInput)) {
             $errors['creditCardInput'] = 'Invalid credit card format. Please provide a valid credit card number';
         }
-
+        
         if (!$this->isValidIpAddress($ipInput)) {
             $errors['ipInput'] = 'Please provide a valid IP address. eg. 192.168.0.1';
         }
-
+        if (!$this->isValidXml($xmlInput)) {
+            $errors['xmlInput'] = 'Invalid XML format. Please provide valid XML';
+        }
+        
+    } catch (ValidationException $e) {
+            // Catch ValidationException and add the error to the $errors array
+            error_log($e->getMessage());
+        }
         // Add validations for other fields
-
+        
         // If there are errors, return them
         if (!empty($errors)) {
             return $errors;
         }
-
+        
         // Input validation passed, store data in the database
         try {
             $stmt = $this->db->prepare(
                 'INSERT INTO client_data 
                    (dateInput1, dateInput2, phoneInput, jsonInput, emailInput, passwordInput, 
-                   postcodeInput, creditCardInput, ipInput, additionalInput) 
+                   postcodeInput, creditCardInput, ipInput, xmlInput) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
             );
 
             $stmt->execute([
                 $dateInput1, $dateInput2, $phoneInput, $jsonInput, $emailInput, $passwordInput,
-                $postcodeInput, $creditCardInput, $ipInput, $additionalInput
+                $postcodeInput, $creditCardInput, $ipInput, $xmlInput
             ]);
 
             return true;
@@ -98,41 +108,48 @@ class SecureAppModel
         // Validate against 'dd/mm/yyyy' format
         $dateTime2 = DateTime::createFromFormat('d/m/Y', $date);
 
-        return ($dateTime1 && $dateTime1->format('Y-m-d') === $date) ||
-            ($dateTime2 && $dateTime2->format('d/m/Y') === $date);
+        if ($dateTime1 && $dateTime1->format('Y-m-d') === $date) {
+            return true;
+        } elseif ($dateTime2 && $dateTime2->format('d/m/Y') === $date) {
+            return true;
+        }
+
+        throw new ValidationException('Invalid date format');
     }
+
 
     private function isValidPhoneNumber($phoneNumber)
     {
-        // Validate UK phone number format: +44 7911 123456
+        // Validate UK phone number format: +44 1234 567890
         $pattern = '/^\+\d{2}\s\d{4}\s\d{6}$/';
 
-        // Use preg_match to test the phone number against the pattern
-        return preg_match($pattern, $phoneNumber) === 1;
+        if (preg_match($pattern, $phoneNumber) === 1) {
+            return true;
+        }
+        throw new ValidationException('Invalid phone number format. Please use the format +44 1234 56789.');
     }
 
-    //valiation with API will be done in front end
     private function isValidJson($jsonInput)
     {
         // Try to decode the JSON string
         $decoded = json_decode($jsonInput);
 
-        // Check for JSON parsing errors
         if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
-            return false; // Invalid JSON
+            throw new ValidationException('Invalid JSON format. Please provide valid JSON data.');
         }
-
-        return true; // Valid JSON
+        return true;
     }
-
 
     private function isValidEmail($emailInput)
     {
         // Regular expression for basic email validation
         $pattern = '/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/';
 
-        // Use preg_match to test the email against the pattern
-        return preg_match($pattern, $emailInput) === 1;
+        if (preg_match($pattern, $emailInput) === 1) {
+            return true;
+        }
+
+        throw new ValidationException('Invalid email format. Please provide a valid email.');
     }
 
     private function isValidPassword($passwordInput)
@@ -164,8 +181,13 @@ class SecureAppModel
             $errors[] = 'Password must contain at least one special character.';
         }
 
-        // If there are errors, return them
-        return $errors;
+        // If there are errors, throw ValidationException
+        if (!empty($errors)) {
+            throw new ValidationException('Invalid password format', 0, null, $errors);
+        }
+
+        // If there are no errors, return an empty array
+        return [];
     }
 
     private function isValidPostcode($postcodeInput)
@@ -174,7 +196,11 @@ class SecureAppModel
         $pattern = '/^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i';
 
         // Use preg_match to test the postcode against the pattern
-        return preg_match($pattern, $postcodeInput) === 1;
+        if (preg_match($pattern, $postcodeInput) !== 1) {
+            throw new ValidationException('Invalid UK postcode format. Please use a valid format (e.g., B11 4NX)');
+        }
+
+        return true;
     }
 
     public function isValidCreditCard($creditCardInput)
@@ -183,12 +209,13 @@ class SecureAppModel
         $cleanCreditCardNumber = preg_replace('/\D/', '', $creditCardInput);
 
         // Check if the credit card number is numeric and passes the Luhn algorithm
-        if (is_numeric($cleanCreditCardNumber) && $this->luhnCheck($cleanCreditCardNumber)) {
-            return true;
+        if (!is_numeric($cleanCreditCardNumber) || !$this->luhnCheck($cleanCreditCardNumber)) {
+            throw new ValidationException('Invalid credit card format. Please provide a valid credit card number');
         }
 
-        return false;
+        return true;
     }
+
 
     // Luhn algorithm check
     private function luhnCheck($number)
@@ -214,7 +241,19 @@ class SecureAppModel
 
     private function isValidIpAddress($ipInput)
     {
-        // Use filter_var to validate the IP address
-        return filter_var($ipInput, FILTER_VALIDATE_IP) !== false;
+         if (filter_var($ipInput, FILTER_VALIDATE_IP) === false) {
+            throw new ValidationException('Please provide a valid IP address. e.g., 192.168.0.1');
+        }
+
+        return true;
+    }
+
+    public function isValidXml($xmlInput)
+    {
+        // Try to load the XML string
+        $xml = simplexml_load_string($xmlInput);
+
+        // Check if the XML is valid
+        return ($xml !== false);
     }
 }
