@@ -85,7 +85,7 @@ class SecureAppView
 
         // Input 7: Postcode Input
         echo '<div class="form-group">';
-        echo '<label for="postcodeInput">Postcode Input:</label>';
+        echo '<label for="postcodeInput">UK Postcode Input:</label>';
         echo
         '<input type="text" class="form-control" name="postcodeInput"   id="postcodeInput" "value="' . htmlspecialchars($_POST['postcodeInput'] ?? '') . '" required>';
         echo '<small class="form-text text-muted">Example: B16 0RP</small>';
