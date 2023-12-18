@@ -25,60 +25,59 @@ class SecureAppModel
         $errors = [];
 
         // Validate inputs
-    try {
+        try {
 
-        if (!$this->isValidDate($dateInput1)) {
-            $errors['dateInput1'] = 'Invalid date format';
-        }
-        
-        if (!$this->isValidDate($dateInput2)) {
-            $errors['dateInput2 '] = 'Invalid date format';
-        }
-        
-        if (!$this->isValidPhoneNumber($phoneInput)) {
-            $errors['phoneInput'] = 'Invalid phone number format. Please use the format +44 1234 56789.';
-        }
+            if (!$this->isValidDate($dateInput1)) {
+                $errors['dateInput1'] = 'Invalid date format';
+            }
 
-        if (!$this->isValidJson($jsonInput)) {
-            $errors['jsonInput'] = 'Invalid JSON format. Please provide valid JSON data.';
-        }
+            if (!$this->isValidDate($dateInput2)) {
+                $errors['dateInput2'] = 'Invalid date format';
+            }
 
-        if (!$this->isValidEmail($emailInput)) {
-            $errors['emailInput'] = 'Invalid email format. Please provide a valid email';
-        }
-        
-        $passwordErrors = $this->isValidPassword($passwordInput);
-        
-        if (!empty($passwordErrors)) {
-            $errors['passwordInput'] = $passwordErrors;
-        }
-        
-        if (!$this->isValidPostcode($postcodeInput)) {
-            $errors['postcodeInput'] = 'Invalid UK postcode format. Please use a valid format (e.g., B11 4NX)';
-        }
-        
-        if (!$this->isValidCreditCard($creditCardInput)) {
-            $errors['creditCardInput'] = 'Invalid credit card format. Please provide a valid credit card number';
-        }
-        
-        if (!$this->isValidIpAddress($ipInput)) {
-            $errors['ipInput'] = 'Please provide a valid IP address. eg. 192.168.0.1';
-        }
-        if (!$this->isValidXml($xmlInput)) {
-            $errors['xmlInput'] = 'Invalid XML format. Please provide valid XML';
-        }
-        
-    } catch (ValidationException $e) {
+            if (!$this->isValidPhoneNumber($phoneInput)) {
+                $errors['phoneInput'] = 'Invalid phone number format. Please use the format +44 1234 56789.';
+            }
+
+            if (!$this->isValidJson($jsonInput)) {
+                $errors['jsonInput'] = 'Invalid JSON format. Please provide valid JSON data.';
+            }
+
+            if (!$this->isValidEmail($emailInput)) {
+                $errors['emailInput'] = 'Invalid email format. Please provide a valid email';
+            }
+
+            $passwordErrors = $this->isValidPassword($passwordInput);
+
+            if (!empty($passwordErrors)) {
+                $errors['passwordInput'] = $passwordErrors;
+            }
+
+            if (!$this->isValidPostcode($postcodeInput)) {
+                $errors['postcodeInput'] = 'Invalid UK postcode format. Please use a valid format (e.g., B11 4NX)';
+            }
+
+            if (!$this->isValidCreditCard($creditCardInput)) {
+                $errors['creditCardInput'] = 'Invalid credit card format. Please provide a valid credit card number';
+            }
+
+            if (!$this->isValidIpAddress($ipInput)) {
+                $errors['ipInput'] = 'Please provide a valid IP address. eg. 192.168.0.1';
+            }
+            if (!$this->isValidXml($xmlInput)) {
+                $errors['xmlInput'] = 'Invalid XML format. Please provide valid XML';
+            }
+        } catch (ValidationException $e) {
             // Catch ValidationException and add the error to the $errors array
             error_log($e->getMessage());
         }
         // Add validations for other fields
-        
+
         // If there are errors, return them
         if (!empty($errors)) {
             return $errors;
         }
-        
+
         // Input validation passed, store data in the database
         try {
             $stmt = $this->db->prepare(
@@ -100,7 +99,7 @@ class SecureAppModel
         }
     }
 
-    private function isValidDate($date)
+    public function isValidDate($date)
     {
         // Validate against 'yyyy-mm-dd' format
         $dateTime1 = DateTime::createFromFormat('Y-m-d', $date);
@@ -118,7 +117,7 @@ class SecureAppModel
     }
 
 
-    private function isValidPhoneNumber($phoneNumber)
+    public function isValidPhoneNumber($phoneNumber)
     {
         // Validate UK phone number format: +44 1234 567890
         $pattern = '/^\+\d{2}\s\d{4}\s\d{6}$/';
@@ -129,7 +128,7 @@ class SecureAppModel
         throw new ValidationException('Invalid phone number format. Please use the format +44 1234 56789.');
     }
 
-    private function isValidJson($jsonInput)
+    public function isValidJson($jsonInput)
     {
         // Try to decode the JSON string
         $decoded = json_decode($jsonInput);
@@ -152,7 +151,7 @@ class SecureAppModel
         throw new ValidationException('Invalid email format. Please provide a valid email.');
     }
 
-    private function isValidPassword($passwordInput)
+    public function isValidPassword($passwordInput)
     {
         $errors = [];
 
@@ -190,7 +189,7 @@ class SecureAppModel
         return [];
     }
 
-    private function isValidPostcode($postcodeInput)
+    public function isValidPostcode($postcodeInput)
     {
         // Regular expression for basic UK postcode validation
         $pattern = '/^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/i';
@@ -239,9 +238,9 @@ class SecureAppModel
         return ($sum % 10 === 0);
     }
 
-    private function isValidIpAddress($ipInput)
+    public function isValidIpAddress($ipInput)
     {
-         if (filter_var($ipInput, FILTER_VALIDATE_IP) === false) {
+        if (filter_var($ipInput, FILTER_VALIDATE_IP) === false) {
             throw new ValidationException('Please provide a valid IP address. e.g., 192.168.0.1');
         }
 
@@ -254,6 +253,12 @@ class SecureAppModel
         $xml = simplexml_load_string($xmlInput);
 
         // Check if the XML is valid
-        return ($xml !== false);
+        if ($xml === false) {
+            throw new ValidationException('Invalid XML format. Please provide valid XML.');
+        }
+
+        return true;
     }
+   
+
 }

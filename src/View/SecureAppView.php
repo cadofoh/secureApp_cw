@@ -73,6 +73,7 @@ class SecureAppView
         echo '<div class="form-group">';
         echo '<label for="passwordInput">Password Input:</label>';
         echo '<input type="password" class="form-control" name="passwordInput"  id="passwordInput" value="' . htmlspecialchars($_POST['passwordInput'] ?? '') . '" required>';
+        echo '<small class="form-text text-muted">Password should be at least 8 characters long with at least one uppercase letter, one lowercase letter, one digit, and one special character. Example:G30&SgH?VeIh1</small>';
         echo '<span class="text-danger">';
         echo '<span id="passwordInputError" class="text-danger"></span>';
         if (isset($errors['passwordInput']) && is_array($errors['passwordInput'])) {
@@ -85,7 +86,7 @@ class SecureAppView
 
         // Input 7: Postcode Input
         echo '<div class="form-group">';
-        echo '<label for="postcodeInput">Postcode Input:</label>';
+        echo '<label for="postcodeInput">UK Postcode Input:</label>';
         echo
         '<input type="text" class="form-control" name="postcodeInput"   id="postcodeInput" "value="' . htmlspecialchars($_POST['postcodeInput'] ?? '') . '" required>';
         echo '<small class="form-text text-muted">Example: B16 0RP</small>';
