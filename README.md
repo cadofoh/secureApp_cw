@@ -24,7 +24,7 @@ To run this project locally, ensure you have the following:
 2. Navigate to the project directory:
 
    ```bash
-   cd secureapp
+   cd secureApp_cw
    ```
 
 3. Install dependencies using Composer:
@@ -56,6 +56,16 @@ To run this project locally, ensure you have the following:
    ```
 
    Access the application in your web browser at [http://localhost:8000](http://localhost:8000).
+
+## Accessing the Application
+
+The main entry point of the SecureApp Data Collection System is located in the `secureApp_cw/public` folder. To access the application, navigate to the following URL in your web browser:
+
+   ```
+http://localhost:8000/secureApp_cw/public
+   ```
+
+
 
 ## Running Unit Tests
 
