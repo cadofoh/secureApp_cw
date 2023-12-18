@@ -67,16 +67,21 @@ class SecureAppModel
             if (!$this->isValidXml($xmlInput)) {
                 $errors['xmlInput'] = 'Invalid XML format. Please provide valid XML';
             }
+            // If there are errors, return them
+            if (!empty($errors)) {
+                $errorMessages = $this->flattenErrors($errors);
+                $errorMessage = implode('. ', $errorMessages);
+                throw new ValidationException($errorMessage);
+               
+            }
+
         } catch (ValidationException $e) {
             // Catch ValidationException and add the error to the $errors array
             error_log($e->getMessage());
+            return $errors;
         }
         // Add validations for other fields
 
-        // If there are errors, return them
-        if (!empty($errors)) {
-            return $errors;
-        }
 
         // Input validation passed, store data in the database
         try {
@@ -94,10 +99,24 @@ class SecureAppModel
 
             return true;
         } catch (PDOException $e) {
-            // Log or handle the database error as needed
+            error_log($e->getMessage());
             return false;
         }
     }
+
+    private function flattenErrors($errors)
+    {
+        $flattenedErrors = [];
+        foreach ($errors as $error) {
+            if (is_array($error)) {
+                $flattenedErrors = array_merge($flattenedErrors, $this->flattenErrors($error));
+            } else {
+                $flattenedErrors[] = strval($error);
+            }
+        }
+        return $flattenedErrors;
+    }
+
 
     public function isValidDate($date)
     {
@@ -114,7 +133,6 @@ class SecureAppModel
         }
 
         return false;
-        throw new ValidationException('Invalid date format');
     }
 
 
@@ -127,7 +145,6 @@ class SecureAppModel
             return true;
         }
         return false;
-        throw new ValidationException('Invalid phone number format. Please use the format +44 1234 56789.');
     }
 
     public function isValidJson($jsonInput)
@@ -137,7 +154,6 @@ class SecureAppModel
 
         if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
             return false;
-            throw new ValidationException('Invalid JSON format. Please provide valid JSON data.');
         }
         return true;
     }
@@ -151,7 +167,6 @@ class SecureAppModel
             return true;
         }
         return false;
-        throw new ValidationException('Invalid email format. Please provide a valid email.');
     }
 
     public function isValidPassword($passwordInput)
@@ -183,10 +198,9 @@ class SecureAppModel
             $errors[] = 'Password must contain at least one special character.';
         }
 
-        // If there are errors, throw ValidationException
+        // If there are errors, return array
         if (!empty($errors)) {
             return $errors;
-            throw new ValidationException('Invalid password format', 0, null, $errors);
         }
 
         // If there are no errors, return an empty array
@@ -201,7 +215,6 @@ class SecureAppModel
         // Use preg_match to test the postcode against the pattern
         if (preg_match($pattern, $postcodeInput) !== 1) {
             return false;
-            throw new ValidationException('Invalid UK postcode format. Please use a valid format (e.g., B11 4NX)');
         }
 
         return true;
@@ -215,7 +228,6 @@ class SecureAppModel
         // Check if the credit card number is numeric and passes the Luhn algorithm
         if (!is_numeric($cleanCreditCardNumber) || !$this->luhnCheck($cleanCreditCardNumber)) {
             return false;
-            throw new ValidationException('Invalid credit card format. Please provide a valid credit card number');
         }
 
         return true;
@@ -248,7 +260,6 @@ class SecureAppModel
     {
         if (filter_var($ipInput, FILTER_VALIDATE_IP) === false) {
             return false;
-            throw new ValidationException('Please provide a valid IP address. e.g., 192.168.0.1');
         }
 
         return true;
@@ -271,6 +282,4 @@ class SecureAppModel
             return false; // Invalid XML
         }
     }
-   
-
 }
