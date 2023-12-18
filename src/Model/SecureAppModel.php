@@ -36,7 +36,7 @@ class SecureAppModel
             }
 
             if (!$this->isValidPhoneNumber($phoneInput)) {
-                $errors['phoneInput'] = 'Invalid phone number format. Please use the format +44 1234 56789.';
+                $errors['phoneInput'] = 'Invalid phone number format. Please use the format +44 1234 567890.';
             }
 
             if (!$this->isValidJson($jsonInput)) {
