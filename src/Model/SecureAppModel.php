@@ -113,6 +113,7 @@ class SecureAppModel
             return true;
         }
 
+        return false;
         throw new ValidationException('Invalid date format');
     }
 
@@ -125,6 +126,7 @@ class SecureAppModel
         if (preg_match($pattern, $phoneNumber) === 1) {
             return true;
         }
+        return false;
         throw new ValidationException('Invalid phone number format. Please use the format +44 1234 56789.');
     }
 
@@ -134,6 +136,7 @@ class SecureAppModel
         $decoded = json_decode($jsonInput);
 
         if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            return false;
             throw new ValidationException('Invalid JSON format. Please provide valid JSON data.');
         }
         return true;
@@ -147,7 +150,7 @@ class SecureAppModel
         if (preg_match($pattern, $emailInput) === 1) {
             return true;
         }
-
+        return false;
         throw new ValidationException('Invalid email format. Please provide a valid email.');
     }
 
@@ -182,6 +185,7 @@ class SecureAppModel
 
         // If there are errors, throw ValidationException
         if (!empty($errors)) {
+            return $errors;
             throw new ValidationException('Invalid password format', 0, null, $errors);
         }
 
@@ -196,6 +200,7 @@ class SecureAppModel
 
         // Use preg_match to test the postcode against the pattern
         if (preg_match($pattern, $postcodeInput) !== 1) {
+            return false;
             throw new ValidationException('Invalid UK postcode format. Please use a valid format (e.g., B11 4NX)');
         }
 
@@ -209,6 +214,7 @@ class SecureAppModel
 
         // Check if the credit card number is numeric and passes the Luhn algorithm
         if (!is_numeric($cleanCreditCardNumber) || !$this->luhnCheck($cleanCreditCardNumber)) {
+            return false;
             throw new ValidationException('Invalid credit card format. Please provide a valid credit card number');
         }
 
@@ -241,23 +247,29 @@ class SecureAppModel
     public function isValidIpAddress($ipInput)
     {
         if (filter_var($ipInput, FILTER_VALIDATE_IP) === false) {
+            return false;
             throw new ValidationException('Please provide a valid IP address. e.g., 192.168.0.1');
         }
 
         return true;
     }
 
-    public function isValidXml($xmlInput)
+    function isValidXML($xmlString)
     {
-        // Try to load the XML string
-        $xml = simplexml_load_string($xmlInput);
+        libxml_use_internal_errors(true); // Disable error output to the browser
 
-        // Check if the XML is valid
-        if ($xml === false) {
-            throw new ValidationException('Invalid XML format. Please provide valid XML.');
+        $doc = simplexml_load_string($xmlString);
+
+        // Check if the XML string is well-formed
+        if ($doc !== false) {
+            return true; // Valid XML
+        } else {
+            // If not valid, you can get the error messages
+            $errors = libxml_get_errors();
+            libxml_clear_errors();
+            // Handle or log errors as needed
+            return false; // Invalid XML
         }
-
-        return true;
     }
    
 
