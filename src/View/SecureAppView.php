@@ -73,6 +73,7 @@ class SecureAppView
         echo '<div class="form-group">';
         echo '<label for="passwordInput">Password Input:</label>';
         echo '<input type="password" class="form-control" name="passwordInput"  id="passwordInput" value="' . htmlspecialchars($_POST['passwordInput'] ?? '') . '" required>';
+        echo '<small class="form-text text-muted">Example: G30&SgH?VeIh1</small>';
         echo '<span class="text-danger">';
         echo '<span id="passwordInputError" class="text-danger"></span>';
         if (isset($errors['passwordInput']) && is_array($errors['passwordInput'])) {
