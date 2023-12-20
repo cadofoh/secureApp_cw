@@ -76,11 +76,12 @@ class SecureAppModel
             }
 
         } catch (ValidationException $e) {
-            // Catch ValidationException and add the error to the $errors array
+            //rethrow exception so it can be cecked in test class
+            throw $e;
             error_log($e->getMessage());
+            // Catch ValidationException and add the error to the $errors array
             return $errors;
         }
-        // Add validations for other fields
 
 
         // Input validation passed, store data in the database
@@ -158,7 +159,7 @@ class SecureAppModel
         return true;
     }
 
-    private function isValidEmail($emailInput)
+    public function isValidEmail($emailInput)
     {
         // Regular expression for basic email validation
         $pattern = '/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/';
