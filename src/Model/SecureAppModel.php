@@ -2,6 +2,10 @@
 // src/Model/SecureAppModel.php
 require_once __DIR__ . '/../config/DatabaseConnection.php';
 require_once __DIR__ .  '/../Exceptions/ValidationException.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use Seld\JsonLint\JsonParser;
+
 class SecureAppModel
 {
     private $db;
@@ -67,22 +71,18 @@ class SecureAppModel
             if (!$this->isValidXml($xmlInput)) {
                 $errors['xmlInput'] = 'Invalid XML format. Please provide valid XML';
             }
-            // If there are errors, return them
+            // If there are errors, return them and throw validationexception with error message
             if (!empty($errors)) {
                 $errorMessages = $this->flattenErrors($errors);
                 $errorMessage = implode('. ', $errorMessages);
                 throw new ValidationException($errorMessage);
-               
             }
-
         } catch (ValidationException $e) {
-            //rethrow exception so it can be cecked in test class
-            throw $e;
+            //rethrow exception so it can be checked in test class
             error_log($e->getMessage());
             // Catch ValidationException and add the error to the $errors array
             return $errors;
         }
-
 
         // Input validation passed, store data in the database
         try {
@@ -102,7 +102,7 @@ class SecureAppModel
         } catch (PDOException $e) {
             error_log($e->getMessage());
             return false;
-        }
+        } 
     }
 
     private function flattenErrors($errors)
@@ -148,15 +148,12 @@ class SecureAppModel
         return false;
     }
 
-    public function isValidJson($jsonInput)
+    function isValidJson($json)
     {
-        // Try to decode the JSON string
-        $decoded = json_decode($jsonInput);
+        $parser = new JsonParser();
+        $result = $parser->lint($json);
 
-        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
-            return false;
-        }
-        return true;
+        return $result === null;
     }
 
     public function isValidEmail($emailInput)

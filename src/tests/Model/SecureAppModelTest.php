@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ .  '/../../Model/SecureAppModel.php';
+require_once __DIR__ .  '/../../View/SecureAppView.php';
 class SecureAppModelTest extends TestCase
 {
     public function testIsValidDate_ValidFormat_ReturnsTrue()
@@ -149,7 +150,6 @@ class SecureAppModelTest extends TestCase
         $model->storeData(...array_values($invalidData));
     }
 
-    // Add these tests to your SecureAppModelTest class
 
     public function testStoreData_InvalidJsonInput_ValidationExceptionThrown()
     {
